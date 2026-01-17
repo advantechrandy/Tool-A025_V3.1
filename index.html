@@ -19,6 +19,7 @@
             color: var(--text-silver);
             font-family: 'JetBrains+Mono', 'Noto+Sans+TC', sans-serif;
             user-select: none;
+            overflow-x: hidden;
         }
         .industrial-card {
             background: var(--industrial-gray);
@@ -117,6 +118,30 @@
             color: white;
             border-color: #3b82f6;
         }
+        .nav-btn {
+            background: #18191b;
+            border: 1px solid #3f4147;
+            color: #cfd2d5;
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .nav-btn:hover {
+            border-color: var(--accent-orange);
+            color: #fff;
+        }
+        .nav-btn.active {
+            background: var(--accent-orange);
+            color: #000;
+            border-color: #fff;
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
     </style>
 </head>
 <body class="p-4 md:p-10 grid-bg">
@@ -130,6 +155,12 @@
                 </div>
                 <h1 class="text-4xl font-black tracking-tighter text-white">BATTERY <span class="text-orange-500">THERMAL</span> ENGINE3.3</h1>
                 <p class="text-gray-500 text-xs">Created by ADV Ken Hung & Randy Chen</p>
+                
+                <!-- Page Navigation -->
+                <div class="flex gap-2 mt-4">
+                    <button onclick="showPage('calculator')" id="btn-calc" class="nav-btn active">CALCULATOR</button>
+                    <button onclick="showPage('documentation')" id="btn-doc" class="nav-btn">DOCUMENTATION</button>
+                </div>
             </div>
             <div class="text-right hidden md:block">
                 <p class="text-[10px] text-gray-600 font-mono text-right">COORD: 25.0330° N, 121.5654° E</p>
@@ -137,176 +168,202 @@
             </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- Left: Inputs -->
-            <div class="lg:col-span-5 space-y-6">
-                <div class="industrial-card p-6 rounded-sm">
-                    <h2 class="text-xs font-bold text-gray-400 mb-6 uppercase tracking-widest flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                        參數設定庫 (Parameters)
-                    </h2>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Mode Switch -->
-                        <div class="md:col-span-2 mb-2">
-                            <label class="label-text">運行模式 (Current Direction)</label>
-                            <div class="flex gap-2">
-                                <button id="mode-discharge" onclick="setMode('discharge')" class="mode-btn active-discharge flex-1 py-2 rounded-sm font-bold text-xs">DISCHARGE (放電)</button>
-                                <button id="mode-charge" onclick="setMode('charge')" class="mode-btn flex-1 py-2 rounded-sm font-bold text-xs">CHARGE (充電)</button>
-                            </div>
-                        </div>
-
-                        <!-- SOC 變數滑桿 -->
-                        <div class="md:col-span-2 bg-blue-900/10 p-4 rounded border border-blue-700/30 mb-2">
-                            <div class="flex justify-between items-center mb-3">
-                                <label class="label-text mb-0 text-blue-400">當前電量 SOC (State of Charge)</label>
-                                <span id="soc-val" class="text-2xl font-black text-blue-400 font-mono bg-blue-500/10 px-3 py-1 rounded border border-blue-500/30">50%</span>
-                            </div>
-                            <div class="relative pt-1 px-1">
-                                <input type="range" id="soc" min="0" max="100" value="50" class="cursor-pointer">
-                                <div class="flex justify-between text-[11px] font-bold font-mono mt-3 text-gray-500 uppercase tracking-tighter">
-                                    <span>EMPTY</span>
-                                    <span>50% (Stable)</span>
-                                    <span>FULL</span>
+        <!-- Page 1: Calculator -->
+        <div id="page-calculator" class="page active">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left: Inputs -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="industrial-card p-6 rounded-sm">
+                        <h2 class="text-xs font-bold text-gray-400 mb-6 uppercase tracking-widest flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                            參數設定庫 (Parameters)
+                        </h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Mode Switch -->
+                            <div class="md:col-span-2 mb-2">
+                                <label class="label-text">運行模式 (Current Direction)</label>
+                                <div class="flex gap-2">
+                                    <button id="mode-discharge" onclick="setMode('discharge')" class="mode-btn active-discharge flex-1 py-2 rounded-sm font-bold text-xs">DISCHARGE (放電)</button>
+                                    <button id="mode-charge" onclick="setMode('charge')" class="mode-btn flex-1 py-2 rounded-sm font-bold text-xs">CHARGE (充電)</button>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- SOH Bar 區域 -->
-                        <div class="md:col-span-2 bg-black/40 p-4 rounded border border-gray-700/50 mb-2">
-                            <div class="flex justify-between items-center mb-3">
-                                <label class="label-text mb-0">健康狀態 SOH (State of Health)</label>
-                                <span id="soh-val" class="text-2xl font-black text-orange-500 font-mono bg-orange-500/10 px-3 py-1 rounded border border-orange-500/30">100%</span>
-                            </div>
-                            <div class="relative pt-1 px-1">
-                                <input type="range" id="soh" min="60" max="100" value="100" class="cursor-pointer">
-                                <div class="flex justify-between text-[11px] font-bold font-mono mt-3 text-gray-500 uppercase tracking-tighter">
-                                    <span>EOL (60%)</span>
-                                    <span>80%</span>
-                                    <span class="text-orange-400">NEW (100%)</span>
+                            <!-- SOC 變數滑桿 -->
+                            <div class="md:col-span-2 bg-blue-900/10 p-4 rounded border border-blue-700/30 mb-2">
+                                <div class="flex justify-between items-center mb-3">
+                                    <label class="label-text mb-0 text-blue-400">當前電量 SOC (State of Charge)</label>
+                                    <span id="soc-val" class="text-2xl font-black text-blue-400 font-mono bg-blue-500/10 px-3 py-1 rounded border border-blue-500/30">50%</span>
+                                </div>
+                                <div class="relative pt-1 px-1">
+                                    <input type="range" id="soc" min="0" max="100" value="50" class="cursor-pointer">
+                                    <div class="flex justify-between text-[11px] font-bold font-mono mt-3 text-gray-500 uppercase tracking-tighter">
+                                        <span>EMPTY</span>
+                                        <span>50% (Stable)</span>
+                                        <span>FULL</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div>
-                            <label class="label-text">負載電流 $I$</label>
-                            <div class="input-group flex">
-                                <input type="number" id="current" value="20" step="1">
-                                <span class="unit-tag">A</span>
+                            <!-- SOH Bar 區域 -->
+                            <div class="md:col-span-2 bg-black/40 p-4 rounded border border-gray-700/50 mb-2">
+                                <div class="flex justify-between items-center mb-3">
+                                    <label class="label-text mb-0">健康狀態 SOH (State of Health)</label>
+                                    <span id="soh-val" class="text-2xl font-black text-orange-500 font-mono bg-orange-500/10 px-3 py-1 rounded border border-orange-500/30">100%</span>
+                                </div>
+                                <div class="relative pt-1 px-1">
+                                    <input type="range" id="soh" min="60" max="100" value="100" class="cursor-pointer">
+                                    <div class="flex justify-between text-[11px] font-bold font-mono mt-3 text-gray-500 uppercase tracking-tighter">
+                                        <span>EOL (60%)</span>
+                                        <span>80%</span>
+                                        <span class="text-orange-400">NEW (100%)</span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
 
-                        <div>
-                            <label class="label-text">基準內阻 $R_0$</label>
-                            <div class="input-group flex">
-                                <input type="number" id="resistance" value="0.015" step="0.001">
-                                <span class="unit-tag">$\Omega$</span>
+                            <div>
+                                <label class="label-text">負載電流 $I$</label>
+                                <div class="input-group flex">
+                                    <input type="number" id="current" value="20" step="1">
+                                    <span class="unit-tag">A</span>
+                                </div>
                             </div>
-                        </div>
 
-                        <div>
-                            <label class="label-text">電芯溫度 $T_{cell}$</label>
-                            <div class="input-group flex">
-                                <input type="number" id="temp" value="25" step="1">
-                                <span class="unit-tag">°C</span>
+                            <div>
+                                <label class="label-text">基準內阻 $R_0$</label>
+                                <div class="input-group flex">
+                                    <input type="number" id="resistance" value="0.015" step="0.001">
+                                    <span class="unit-tag">$\Omega$</span>
+                                </div>
                             </div>
-                        </div>
 
-                        <div>
-                            <label class="label-text">老化阻抗係數 $\kappa$</label>
-                            <div class="input-group flex">
-                                <input type="number" id="aging-k" value="1.5" step="0.1">
-                                <span class="unit-tag">$\times$</span>
+                            <div>
+                                <label class="label-text">電芯溫度 $T_{cell}$</label>
+                                <div class="input-group flex">
+                                    <input type="number" id="temp" value="25" step="1">
+                                    <span class="unit-tag">°C</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="label-text">老化阻抗係數 $\kappa$</label>
+                                <div class="input-group flex">
+                                    <input type="number" id="aging-k" value="1.5" step="0.1">
+                                    <span class="unit-tag">$\times$</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 係數參考與知識警告欄位 -->
-                <div class="space-y-4">
-                    <div class="industrial-card p-4 rounded-sm border-l-2 border-l-orange-500 bg-black/20">
-                        <p class="text-[10px] font-bold text-orange-500 mb-2 font-mono uppercase tracking-widest">[老化係數參考值基準]</p>
-                        <ul class="text-[10px] leading-relaxed text-gray-500 font-mono list-disc pl-4 space-y-1">
-                            <li><span class="text-gray-300">LFP (磷酸鐵鋰):</span> 0.8 ~ 1.5</li>
-                            <li><span class="text-gray-300">NMC/NCA (三元):</span> 1.5 ~ 2.5</li>
-                            <li><span class="text-orange-400">EOL 阻抗翻倍基準:</span> 5.0</li>
-                        </ul>
+                <!-- Right: Display -->
+                <div class="lg:col-span-7 flex flex-col gap-6">
+                    <!-- Main Value Board -->
+                    <div class="industrial-card p-8 rounded-sm relative overflow-hidden bg-gradient-to-br from-[#2b2d31] to-[#1e1f22]">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-orange-500" id="indicator-strip"></div>
+                        
+                        <div class="flex justify-between items-start mb-8">
+                            <div>
+                                <h3 class="text-gray-400 text-xs font-bold tracking-widest uppercase mb-1">Total Heat Generation Rate</h3>
+                                <div class="flex items-baseline gap-2">
+                                    <span id="q-total" class="text-7xl font-black text-white italic">--</span>
+                                    <span class="text-2xl font-bold text-orange-500 italic">W</span>
+                                </div>
+                            </div>
+                            <div class="text-right flex flex-col items-end">
+                                <span id="mode-badge" class="px-2 py-1 bg-orange-500/10 text-orange-500 border border-orange-500/20 text-[10px] font-bold mb-2 tracking-widest">DISCHARGING</span>
+                                <span class="text-[10px] text-gray-600 font-mono">STABILITY: NORMAL</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-6 border-t border-gray-700 pt-8">
+                            <div>
+                                <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">焦耳熱 ($I^2R$)</p>
+                                <p id="q-joule" class="text-xl font-bold text-blue-400 font-mono">--</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">熵變熱 ($IT\frac{dU}{dT}$)</p>
+                                <p id="q-entropy" class="text-xl font-bold text-purple-400 font-mono">--</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">動態內阻 ($R$)</p>
+                                <p id="res-actual" class="text-xl font-bold text-emerald-400 font-mono">--</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- SOC 非恆定發熱說明欄位 -->
-                    <div class="industrial-card p-4 rounded-sm border-l-2 border-l-emerald-500 bg-emerald-950/10">
-                        <p class="text-[10px] font-bold text-emerald-500 mb-2 font-mono uppercase tracking-widest">[SOC 動態產熱特徵]</p>
-                        <p class="text-[10px] leading-relaxed text-gray-400 font-mono">
-                            在實際的電池循環中，發熱量確實會隨著 SOC（荷電狀態） 的變化而波動，主要是因為內阻 $R$ 和熵變係數 $dU/dT$ 都不是常數。<br><br>
-                            當 SOC 接近極端值（0% 或 100%）時，電化學反應趨於極限，極化內阻會顯著增加。此外，隨著鋰離子穿梭於正負極材料層間，晶格結構的熵值變化也會造成產熱率的週期性起伏。
-                        </p>
-                    </div>
-
-                    <div class="industrial-card p-4 rounded-sm border-l-2 border-l-red-500 bg-red-950/10">
-                        <p class="text-[10px] font-bold text-red-500 mb-2 font-mono uppercase tracking-widest">[高溫風險與熱不穩定性]</p>
-                        <p class="text-[10px] leading-relaxed text-gray-500 font-mono">
-                            雖然「高溫降低廢熱」聽起來很理想，但這會導致電池進入一個不穩定的動態：<br><br>
-                            <span class="text-emerald-500">● 效率甜點區：</span>通常電池在 $35^\circ\text{C} \sim 45^\circ\text{C}$ 時性能最好。<br>
-                            <span class="text-orange-500">● 副反應啟動：</span>一旦溫度超過 $60^\circ\text{C} \sim 70^\circ\text{C}$，SEI 膜會開始分解，這是一個放熱反應。<br>
-                            <span class="text-red-500">● 惡性循環：</span>副反應熱量若大於散熱，將導致熱失控（Thermal Runaway）。
-                        </p>
-                    </div>
-
-                    <div class="industrial-card p-4 rounded-sm border-l-2 border-l-blue-500 bg-blue-950/10">
-                        <p class="text-[10px] font-bold text-blue-500 mb-2 font-mono uppercase tracking-widest">[什麼是電池 SEI 膜]</p>
-                        <p class="text-[10px] leading-relaxed text-gray-400 font-mono">
-                            在鋰電池第一次充電（化成階段）時，電解液在負極表面反應形成幾奈米厚的鈍化層，即 SEI 膜。它是電池的「皮膚」，能防止電解液持續消耗並允許鋰離子通過，是電池壽命與安全的關鍵。
-                        </p>
+                    <!-- Equation Box -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="industrial-card p-4 text-[11px] font-mono border-l-blue-500">
+                            <span class="text-blue-500 font-bold block mb-2 underline text-xs italic">熱化學平衡 (動態)</span>
+                            $\Phi(SOC) = I^2 R(SOC, T, SOH) + I T \frac{\partial U}{\partial T}(SOC)$
+                        </div>
+                        <div class="industrial-card p-4 text-[11px] font-mono border-l-emerald-500">
+                            <span class="text-emerald-500 font-bold block mb-2 underline text-xs italic">SOC 阻抗修正</span>
+                            $R_{dyn} = R_{aged} \cdot (1 + \frac{0.1}{SOC + 0.05} + \frac{0.1}{1.05 - SOC})$
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Right: Display -->
-            <div class="lg:col-span-7 flex flex-col gap-6">
-                <!-- Main Value Board -->
-                <div class="industrial-card p-8 rounded-sm relative overflow-hidden bg-gradient-to-br from-[#2b2d31] to-[#1e1f22]">
-                    <div class="absolute top-0 left-0 w-1 h-full bg-orange-500" id="indicator-strip"></div>
-                    
-                    <div class="flex justify-between items-start mb-8">
-                        <div>
-                            <h3 class="text-gray-400 text-xs font-bold tracking-widest uppercase mb-1">Total Heat Generation Rate</h3>
-                            <div class="flex items-baseline gap-2">
-                                <span id="q-total" class="text-7xl font-black text-white italic">--</span>
-                                <span class="text-2xl font-bold text-orange-500 italic">W</span>
-                            </div>
-                        </div>
-                        <div class="text-right flex flex-col items-end">
-                            <span id="mode-badge" class="px-2 py-1 bg-orange-500/10 text-orange-500 border border-orange-500/20 text-[10px] font-bold mb-2 tracking-widest">DISCHARGING</span>
-                            <span class="text-[10px] text-gray-600 font-mono">STABILITY: NORMAL</span>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-3 gap-6 border-t border-gray-700 pt-8">
-                        <div>
-                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">焦耳熱 ($I^2R$)</p>
-                            <p id="q-joule" class="text-xl font-bold text-blue-400 font-mono">--</p>
-                        </div>
-                        <div>
-                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">熵變熱 ($IT\frac{dU}{dT}$)</p>
-                            <p id="q-entropy" class="text-xl font-bold text-purple-400 font-mono">--</p>
-                        </div>
-                        <div>
-                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">動態內阻 ($R$)</p>
-                            <p id="res-actual" class="text-xl font-bold text-emerald-400 font-mono">--</p>
-                        </div>
-                    </div>
+        <!-- Page 2: Documentation -->
+        <div id="page-documentation" class="page">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- 老化係數說明 -->
+                <div class="industrial-card p-6 rounded-sm border-l-4 border-l-orange-500 bg-black/20">
+                    <h3 class="text-sm font-bold text-orange-500 mb-4 font-mono uppercase tracking-widest flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        [老化係數參考值基準]
+                    </h3>
+                    <ul class="text-xs leading-relaxed text-gray-400 font-mono list-disc pl-5 space-y-2">
+                        <li><span class="text-gray-200">LFP (磷酸鐵鋰):</span> 0.8 ~ 1.5 
+                            <p class="text-[10px] text-gray-600 mt-1">結構穩定性高，老化對阻抗影響相對線性。</p>
+                        </li>
+                        <li><span class="text-gray-200">NMC/NCA (三元):</span> 1.5 ~ 2.5 
+                            <p class="text-[10px] text-gray-600 mt-1">能量密度高，循環後期阻抗增長較快。</p>
+                        </li>
+                        <li><span class="text-orange-400 font-bold">EOL 阻抗翻倍基準:</span> 5.0 
+                            <p class="text-[10px] text-gray-600 mt-1">當阻抗到達此係數，電池廢熱將難以控制。</p>
+                        </li>
+                    </ul>
                 </div>
 
-                <!-- Equation Box -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="industrial-card p-4 text-[11px] font-mono border-l-blue-500">
-                        <span class="text-blue-500 font-bold block mb-2 underline text-xs italic">熱化學平衡 (動態)</span>
-                        $\Phi(SOC) = I^2 R(SOC, T, SOH) + I T \frac{\partial U}{\partial T}(SOC)$
-                    </div>
-                    <div class="industrial-card p-4 text-[11px] font-mono border-l-emerald-500">
-                        <span class="text-emerald-500 font-bold block mb-2 underline text-xs italic">SOC 阻抗修正</span>
-                        $R_{dyn} = R_{aged} \cdot (1 + \frac{0.1}{SOC + 0.05} + \frac{0.1}{1.05 - SOC})$
-                    </div>
+                <!-- SOC 動態產熱特徵 -->
+                <div class="industrial-card p-6 rounded-sm border-l-4 border-l-emerald-500 bg-emerald-950/10">
+                    <h3 class="text-sm font-bold text-emerald-500 mb-4 font-mono uppercase tracking-widest flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        [SOC 動態產熱特徵]
+                    </h3>
+                    <p class="text-xs leading-relaxed text-gray-400 font-mono">
+                        在實際的電池循環中，發熱量確實會隨著 SOC（荷電狀態） 的變化而波動，主要是因為內阻 $R$ 和熵變係數 $dU/dT$ 都不是常數。<br><br>
+                        當 SOC 接近極端值（0% 或 100%）時，電化學反應趨於極限，極化內阻會顯著增加。此外，隨著鋰離子穿梭於正負極材料層間，晶格結構的熵值變化也會造成產熱率的週期性起伏。
+                    </p>
+                </div>
+
+                <!-- 高溫風險與熱不穩定性 -->
+                <div class="industrial-card p-6 rounded-sm border-l-4 border-l-red-500 bg-red-950/10">
+                    <h3 class="text-sm font-bold text-red-500 mb-4 font-mono uppercase tracking-widest flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        [高溫風險與熱不穩定性]
+                    </h3>
+                    <p class="text-xs leading-relaxed text-gray-400 font-mono">
+                        雖然「高溫降低廢熱」聽起來很理想，但這會導致電池進入一個不穩定的動態：<br><br>
+                        <span class="text-emerald-500 font-bold">● 效率甜點區：</span>通常電池在 $35^\circ\text{C} \sim 45^\circ\text{C}$ 時性能最好。<br>
+                        <span class="text-orange-500 font-bold">● 副反應啟動：</span>一旦溫度超過 $60^\circ\text{C} \sim 70^\circ\text{C}$，SEI 膜會開始分解，這是一個放熱反應。<br>
+                        <span class="text-red-500 font-bold">● 惡性循環：</span>副反應熱量若大於散熱，將導致熱失控（Thermal Runaway）。
+                    </p>
+                </div>
+
+                <!-- SEI 膜說明 -->
+                <div class="industrial-card p-6 rounded-sm border-l-4 border-l-blue-500 bg-blue-950/10">
+                    <h3 class="text-sm font-bold text-blue-500 mb-4 font-mono uppercase tracking-widest flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                        [什麼是電池 SEI 膜]
+                    </h3>
+                    <p class="text-xs leading-relaxed text-gray-400 font-mono">
+                        在鋰電池第一次充電（化成階段）時，電解液在負極表面反應形成幾奈米厚的鈍化層，即 SEI 膜。它是電池的「皮膚」，能防止電解液持續消耗並允許鋰離子通過，是電池壽命與安全的關鍵。
+                    </p>
                 </div>
             </div>
         </div>
@@ -316,10 +373,26 @@
     <input type="hidden" id="arrhenius" value="3200">
 
     <script>
+        // 禁用右鍵選單
         document.addEventListener('contextmenu', e => e.preventDefault());
 
         let currentMode = 'discharge'; 
         const ids = ['current', 'resistance', 'temp', 'soh', 'aging-k', 'soc'];
+
+        // 頁面切換邏輯
+        function showPage(pageName) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + pageName).classList.add('active');
+            
+            document.getElementById('btn-calc').classList.remove('active');
+            document.getElementById('btn-doc').classList.remove('active');
+            
+            if (pageName === 'calculator') {
+                document.getElementById('btn-calc').classList.add('active');
+            } else {
+                document.getElementById('btn-doc').classList.add('active');
+            }
+        }
 
         function setMode(mode) {
             currentMode = mode;
